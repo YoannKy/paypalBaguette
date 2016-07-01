@@ -1,0 +1,17 @@
+{
+    "name": "yoannky/paypalbaguette",
+    "description": "paypal package for online payment",
+    "type": "laravel-package",
+    "authors": [
+        {
+            "name": "yoannKy",
+            "email": "y.keoxay@gmail.com"
+        }
+    ],
+    "require": {},
+    "autoload": {
+        "psr-4": {
+            "Yoannky\\Paypalbaguette\\": "src/"
+        }
+    }
+}
