@@ -16,9 +16,10 @@ class PaypalBaguette
      * @param  String $currency
      * @param  String $succesUrl
      * @param  String $cancelUrl
+     * @param  boolean $redirect
      * @return Paypal redirect url
      */
-    public function pay($amount, $currency, $successUrl, $cancelUrl)
+    public function pay($amount, $currency, $successUrl, $cancelUrl, $redirect)
     {
         //List of allowed currency, workaround for PHP ver 5.5 and older
         define('ALLOWED_CURRENCY', serialize([
@@ -73,7 +74,7 @@ class PaypalBaguette
             "transactions" =>array(
                 array("amount"=>array(
                     "total" => str_replace(',', '.', $amount),
-                    "currency" => "USD"
+                    "currency" => strtoupper($currency)
                 ))
             )
         );
@@ -99,19 +100,20 @@ class PaypalBaguette
             throw new Exception("Invalid request", 1);
         }
         
-        
-
-        ob_start();
         $url = $jsonResponse["links"][1]["href"];
+        if ($redirect) {
+            ob_start();
 
-        // clear out the output buffer
-        while (ob_get_status()) {
-            ob_end_clean();
+            // clear out the output buffer
+            while (ob_get_status()) {
+                ob_end_clean();
+            }
+
+            header("Location:$url");
+            exit();
+        } else {
+            return $url;
         }
-
-        header("Location:$url");
-        exit();
-
     }
 
     /**
