@@ -1,7 +1,7 @@
 # LARAVEL PAYPALBAGUETTE - A PAYPAL PACKAGE FOR EXPRESS CHECKOUT
 
 ### Version
-1.0.1
+1.0.2
 
 
 ### Installation

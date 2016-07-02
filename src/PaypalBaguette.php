@@ -4,6 +4,7 @@ namespace Yoannky\Paypalbaguette;
 
 use Session;
 use Exception;
+use Config;
 
 class PaypalBaguette
 {
@@ -122,9 +123,9 @@ class PaypalBaguette
     */
     private function getToken()
     {
-        $client_id = env('CLIENT_ID');
-        $client_secret = env('APP_SECRET');
-
+        $client_id =  Config::get('paypalbaguette.client_id');
+        $client_secret = Config::get('paypalbaguette.client_secret');
+        
         if (is_null($client_id) || is_null($client_id)) {
             throw new Exception("Either Paypal client id or client secret is missing", 1);
         }
