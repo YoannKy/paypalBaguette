@@ -36,8 +36,9 @@ $ php artisan vendor:publish
 ### Usage:
 This package sole purpose is to deliver a quick way to deal with paypal express checkouts, hence there is only one method:
 
-#### pay($amount, $currency, $successUrl, $cancelUrl)
+#### pay($amount, $currency, $successUrl, $cancelUrl, $autoRedirect)
 ##### amount is the amount for the paypal transaction
 ##### currency is the currency code (USD,EUR,...)
 ##### successUrl is the link returned in case of a success
 ##### cancelUrl is the link returned in case of a cancel 
+##### if autoRedirect is set to true, the method will automatically redirect the user to the paypal redirect link, if not, the method will just return the redirect url  
