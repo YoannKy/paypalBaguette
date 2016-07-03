@@ -5,11 +5,12 @@ namespace Yoannky\Paypalbaguette;
 use Session;
 use Exception;
 use Config;
-
+use Illuminate\Http\Request;
 class PaypalBaguette
 {
 
-    const BASE_URL =  "https://api.sandbox.paypal.com";
+    const BASE_URL_SANDBOX =  "https://api.sandbox.paypal.com";
+    const BASE_URL =  "https://api.paypal.com";
 
     /**
      * Paypal express checkout method
@@ -20,7 +21,7 @@ class PaypalBaguette
      * @param  boolean $redirect
      * @return Paypal redirect url
      */
-    public function pay($amount, $currency, $successUrl, $cancelUrl, $redirect)
+    public function pay($amount, $currency, $successUrl, $cancelUrl, $autoRedirect)
     {
         //List of allowed currency, workaround for PHP ver 5.5 and older
         define('ALLOWED_CURRENCY', serialize([
@@ -87,7 +88,7 @@ class PaypalBaguette
         
         curl_setopt($ch, CURLOPT_HTTPHEADER, $header);
 
-        curl_setopt($ch, CURLOPT_URL, Self::BASE_URL.$url);
+        curl_setopt($ch, CURLOPT_URL, (Config::get('paypalbaguette.env') == 'sandbox' ? Self::BASE_URL_SANDBOX : BASE_URL).$url);
         // curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_POSTFIELDS, $json);
@@ -102,7 +103,7 @@ class PaypalBaguette
         }
         
         $url = $jsonResponse["links"][1]["href"];
-        if ($redirect) {
+        if ($autoRedirect) {
             ob_start();
 
             // clear out the output buffer
@@ -118,14 +119,58 @@ class PaypalBaguette
     }
 
     /**
+     * Paypal express checkout confirm method
+     * @param  Request $request
+     * @return json response
+     */
+    public function confirm(Request $request)
+    {
+        $payment = $request->get('paymentId');
+        $payer = $request->get('PayerID');
+
+        $token = Session::get('access_token', Self::getToken());
+
+        $header =  [
+            'Authorization: Bearer '.$token,
+            'Accept: application/json',
+            'Content-Type : application/json'
+        ];
+        $url = "/v1/payments/payment/".$payment."/execute/";
+
+        $data = array(
+            "payer_id" => $payer
+        );
+
+        $json = json_encode($data);
+        
+
+        $ch = curl_init();
+        
+        curl_setopt($ch, CURLOPT_HTTPHEADER, $header);
+
+        curl_setopt($ch, CURLOPT_URL,  (Config::get('paypalbaguette.env') == 'sandbox' ? Self::BASE_URL_SANDBOX : BASE_URL).$url);
+        // curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $json);
+        $result = curl_exec($ch);
+
+        $jsonResponse = json_decode($result, 1);    
+
+        curl_close($ch);
+
+        return $jsonResponse;
+    }
+
+    /**
      * request Paypal access token and store it in session
      * @param  none
-    */
+     */
     private function getToken()
     {
         $client_id =  Config::get('paypalbaguette.client_id');
         $client_secret = Config::get('paypalbaguette.client_secret');
-        
+        var_dump($client_id);
+        var_dump($client_secret);
         if (is_null($client_id) || is_null($client_id)) {
             throw new Exception("Either Paypal client id or client secret is missing", 1);
         }
@@ -133,7 +178,7 @@ class PaypalBaguette
     
         $ch = curl_init();
 
-        curl_setopt($ch, CURLOPT_URL, Self::BASE_URL.$url);
+        curl_setopt($ch, CURLOPT_URL, (Config::get('paypalbaguette.env') == 'sandbox' ? Self::BASE_URL_SANDBOX : BASE_URL).$url);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
         curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);

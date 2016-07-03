@@ -18,7 +18,7 @@ return [
 
 
 
-        /*
+    /*
     |--------------------------------------------------------------------------
     | Paypal secret id
     |--------------------------------------------------------------------------
@@ -30,4 +30,18 @@ return [
     |
     */
     'client_secret' => env('ClIENT_SECRET', 'your-client-secret'),
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Paypal env
+    |--------------------------------------------------------------------------
+    |
+    | Here you may specify your env that should be used
+    | by the api. If you set it to sandbox, then the sandbox mod will
+    | be activated
+    |
+    */
+    'env' => env('PAYPAL_ENV', 'sandbox'),
+
 ];

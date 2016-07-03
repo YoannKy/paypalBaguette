@@ -1,7 +1,7 @@
 # LARAVEL PAYPALBAGUETTE - A PAYPAL PACKAGE FOR EXPRESS CHECKOUT
 
 ### Version
-1.0.2
+1.0.3
 
 
 ### Installation
@@ -34,7 +34,7 @@ $ php artisan vendor:publish
 #### Add both your paypal client id and secret id in config/paypalbaguette.php
 
 ### Usage:
-This package sole purpose is to deliver a quick way to deal with paypal express checkouts, hence there is only one method:
+This package sole purpose is to deliver a quick way to deal with paypal express checkouts, hence there is only two methods for payment:
 
 #### pay($amount, $currency, $successUrl, $cancelUrl, $autoRedirect)
 ##### amount is the amount for the paypal transaction
@@ -42,3 +42,7 @@ This package sole purpose is to deliver a quick way to deal with paypal express 
 ##### successUrl is the link returned in case of a success
 ##### cancelUrl is the link returned in case of a cancel 
 ##### if autoRedirect is set to true, the method will automatically redirect the user to the paypal redirect link, if not, the method will just return the redirect url  
+
+### confirm($request)
+##### the request returned by the pay method, if the buyer is redirected to the success URL
+you have to match your success url with this method
